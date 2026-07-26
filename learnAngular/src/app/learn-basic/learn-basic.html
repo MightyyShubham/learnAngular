@@ -1,0 +1,31 @@
+<p>in this Component we will learn the basic of Angular!</p>
+<ul>This course covers the following topics:</ul>
+<li>Custom components with &#64; Component</li>
+<app-custom></app-custom>
+<li>Components &#64; Input and &#64;Output, event Emitters</li>
+<app-parent-component data="value passed from basic component"></app-parent-component>
+<li>Control flow syntax: &#64; if, &#64; for, &#64; switch</li>
+<li>ngFor</li>
+<li>ngIf</li>
+<li>ngClass</li>
+<li>ngStyle</li>
+<li>ngSwitch</li>
+<app-control-component></app-control-component>
+<li>Built-In Pipes</li>
+<p>{{ 'hello world' | uppercase }}</p>
+<p>{{ [1, 2, 3, 4, 5] | slice: 1:3 }}</p>
+<li>Async Pipe</li>
+
+<li>Custom Pipes</li>
+<p>{{'shubham' | greetings}}</p>
+<li>@Injectable and Custom Services</li>
+<li>HTTP Client - GET POST PUT DELETE</li>
+
+@if (users$ | async; as users) {
+@for (item of users; track item) {
+    <p>{{item.name  }}</p>
+}
+}
+@else{
+    <p>loading....</p>
+}

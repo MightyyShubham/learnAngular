@@ -1,0 +1,19 @@
+<p>example of if control!</p>
+<button (click)="toggle()">toggle</button>
+
+@if (!toggleVal) {
+    <p>toggle val is false</p>
+}
+@if (toggleVal) {
+    <p>toggle val is true</p>
+}
+
+<p>for loop</p>
+@for (item of items;track item) {
+    <span>{{item}}</span>
+}
+
+<div [ngSwitch]="toggleVal">
+    <div *ngSwitchCase="true">output</div>
+    <div *ngSwitchDefault>output2</div>
+</div>
