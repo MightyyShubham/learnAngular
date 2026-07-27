@@ -20,7 +20,6 @@ export class App {
   {
     title:"Routes",routeTo:"learnRouting",
   },
-  
   {
     title:"Core Deep Drive",routeTo:"learnCore",
   },

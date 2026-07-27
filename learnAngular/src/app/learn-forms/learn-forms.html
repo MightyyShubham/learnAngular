@@ -1,1 +1,77 @@
-<p>learn-forms works!</p>
+<p>This course covers the following topics:</p>
+<div class="qa-container">
+<p class="question">Introduction to the Angular Forms module</p>
+<span class="answer">The Angular Forms module provides a structured way to create, manage, and validate forms in Angular applications. It simplifies handling user input, tracking form state, and validating data before submission.</span>
+<p class="question">Angular Material form components</p>
+<p class="question">Template-driven Forms - how does ngModel work?</p>
+<span>Template-driven forms are simple to create and are suitable for small or basic applications. They rely on Angular directives within the HTML template.</span>
+<p class="answer">value of {{username}}</p>
+<form #userForm="ngForm">
+    <input type="text" name="username" [(ngModel)]="username" required>
+</form>
+<p class="question">Typical Form validation rules</p>
+<span class="answer">Required Field, Minimum length,MAmimun length,Email format,pattern validation, Minimum and maximun value,password length , confirm password , custom validation</span>
+<p class="question">Form field validation error messages</p>
+<span class="answer">this field is required , value must be greater than 18, please enter valid email</span>
+<p class="question">Using ngModel for one-way binding and bi-directional data binding</p>
+<p class="answer">Understanding ngModelOptions in detail</p>
+updateOn: 'change'	Updates the model on every input change (default).
+updateOn: 'blur'	Updates the model when the input loses focus.
+updateOn: 'submit'	Updates the model only when the form is submitted.
+standalone: true	Excludes the control from the parent form's registration and validation.
+<p class="question">Template-driven form custom validator</p>
+<p class="answer">Directive bana ke value valid ya nahi voo try kar sakte hai </p>
+<p class="question">How to use the FormBuilder service</p>
+<span>this is form builder</span>
+<form [formGroup]="testForm">
+
+  <label>Username</label>
+  <input type="text" formControlName="username">
+
+  <label>Password</label>
+  <input type="password" formControlName="password">
+
+  <button type="submit">Login</button>
+
+</form>
+<p class="question">Refactoring of a form from template-driven to a reactive form</p>
+<form [formGroup]="loginform" (submit)="submit()">
+    <input type="text" formControlName="username">
+    <input type="text" formControlName="email">
+    <button type="submit"  [disabled]="!loginform.valid">
+        Save
+    </button>
+</form>
+<p class="question">Comparison between template-driven and reactive forms - when to use each and why</p>
+<p class="answer">Template-driven forms use Angular directives such as ngModel to create and manage form controls directly in the HTML template.
+Reactive forms define the entire form structure in the TypeScript component using FormGroup, FormControl, and FormBuilder.
+Use Template-Driven Forms when you need a simple form with basic validation and want to develop it quickly.
+Use Reactive Forms when you need full control over the form, advanced validation, dynamic form fields, or better scalability and testability.</p>
+<p class="question">Why are they called reactive forms? Understanding the multiple Observables available</p>
+<p class="answer"> class="question"How to reset and set new values in a reactive form</p>
+<span class="answer">setValue() updates every control and requires values for all controls.</span>
+<span class="answer">    patchValue() updates only the specified controls, making it ideal for partial updates.</span>
+<span class="answer">    reset() clears the form and restores its state to pristine and untouched.</span>
+<span class="answer">    reset(...) clears the form while setting new default values, making it useful for initializing or reinitializing forms.</span>
+<p class="question">Development of a complex form using reactive forms</p>
+<p class="question">How to use all types of commonly used form controls: normal inputs, text areas, radio buttons, checkboxes, calendars, auto-completion, etc.</p>
+<p class="answer">The formGroup and formControlName, and formControl directives</p>
+<p class="answer">The formGroup directive binds an HTML < form  >element to a FormGroup object created in the component.</p>
+<p class="answer">The formControlName directive connects an individual form element to a FormControl inside a FormGroup.</p>
+<p class="answer">The formControl directive binds a form element directly to a standalone FormControl object. Unlike formControlName, it does not require a parent FormGroup.</p>
+<p class="question">Reactive forms custom validators - multi-field validation</p>
+<p class="question">Backend validation of a form field using async validators</p>
+<p class="answer">Angular Async Validators are used when form validation depends on backend data. They return an Observable or Promise that resolves to either a validation error object or null. Typical use cases include checking username availability, email uniqueness, or validating codes against a database. By combining async validators with synchronous validators and using options like updateOn: 'blur', you can create efficient, responsive, and reliable form validation.</p>
+<p class="question">Dependent fields - how to enable or disable some form fields depending on the values of other fields</p>
+<p class="answer">Dependent fields allow one form control to influence the behaviour of another. In Angular Reactive Forms, this is typically achieved by subscribing to the valueChanges observable of one control and using methods such as enable(), disable(), setValidators(), clearValidators(), and updateValueAndValidity() to modify related controls. This approach helps create dynamic, user-friendly forms that respond intelligently to user input.</p>
+<p class="question">Pre-saving a form draft</p>
+<p class="answer">Pre-saving a form draft allows users to continue working on a form without losing their progress. In Angular Reactive Forms, this is commonly implemented by subscribing to the form's valueChanges observable and saving the current values to Local Storage or a backend server. When the form is reopened, the saved data can be restored using patchValue(). For better performance, use RxJS operators such as debounceTime() to reduce unnecessary save operations, and clear the saved draft once the form is successfully submitted.</p>
+<p class="question">Building a multi-step form with Angular Material</p>
+<p class="answer">Angular Material's Stepper component provides a structured way to build multi-step forms. Each step is associated with its own FormGroup (or a nested group within a parent form), allowing independent validation before users proceed. Features such as matStepperNext, matStepperPrevious, and linear navigation help create intuitive, user-friendly forms, making the stepper an excellent choice for registration, checkout, application, and other complex workflows.</p>
+<p class="question">Reusable nested forms (an address form)</p>
+<p class="answer">reusable nested form is a child FormGroup extracted into its own Angular component and reused across multiple parent forms. An address form is a common example, where fields such as street, city, state, and postal code are grouped into a nested FormGroup and passed to a reusable AddressComponent. This approach reduces duplication, improves maintainability, and makes Angular Reactive Forms easier to scale and manage in large applications.</p>
+<p class="question">Custom File Upload Form Control</p>
+<p class="answer">A Custom File Upload Form Control is an Angular component that implements the ControlValueAccessor interface, allowing it to behave like a standard form control. It can be used with formControlName, supports validation, and integrates with Reactive Forms. After a file is selected, it can be uploaded to a backend using FormData, making this approach ideal for handling documents, images, and other file uploads in Angular applications.</p>
+<p class="question">Form Arrays</p>
+<p class="answer">A FormArray is an Angular Reactive Forms class used to manage dynamic collections of controls. Unlike a FormGroup, which uses named controls, a FormArray stores controls by index, making it ideal for forms where users can add or remove fields at runtime. It supports FormControl, FormGroup, and nested FormArray instances, providing a flexible solution for building dynamic and scalable forms.</p>
+</div>

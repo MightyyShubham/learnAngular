@@ -1,0 +1,25 @@
+.qa-container {
+    max-width: 900px;
+    margin: 20px auto;
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.7;
+}
+
+.question {
+    font-size: 22px;
+    font-weight: bold;
+    color: #1f4e79;
+    margin-top: 25px;
+    margin-bottom: 10px;
+    padding-left: 10px;
+    border-left: 5px solid #1f4e79;
+}
+
+.answer {
+    font-size: 16px;
+    color: #444;
+    background: #f8f9fa;
+    padding: 12px 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
