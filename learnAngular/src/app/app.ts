@@ -2,10 +2,11 @@ import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { LearnBasic } from './learn-basic/learn-basic';
 import { LearnForms } from './learn-forms/learn-forms';
+import { LearnRouting } from './learn-routing/learn-routing';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet,LearnBasic,LearnForms],
+  imports: [RouterOutlet,LearnBasic,LearnForms,LearnRouting],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

@@ -1,30 +1,915 @@
-<p>learn-routing works!</p>
-This course covers the following topics:
 
-<p class="question">Router setup with provideRouter and feature functions</p>
-     
-<p class="question">Functional redirects — redirectTo as a function receiving params and query params</p>
-<p class="question">Lazy loading with loadComponent and loadChildren</p>
-<p class="question">Navigation with routerLink, routerLinkActive, and ariaCurrentWhenActive</p>
-<p class="question">Route parameters and withComponentInputBinding — params, query params, and resolved data as component inputs</p>
-<p class="question">Resolvers — ResolveFn, skipping HTTP with navigation state</p>
-<p class="question">Child routes, nested outlets, and relativeTo navigation</p>
-<p class="question">Route-scoped providers — services created and destroyed with a route subtree</p>
-<p class="question">Query parameters and queryParamsHandling (preserve, merge)</p>
-<p class="question">canActivate — authentication guard with redirect to login and return URL</p>
-<p class="question">canActivateChild — protecting an entire child route subtree</p>
-<p class="question">canDeactivate — unsaved-changes confirmation dialog; bypassing the guard with info</p>
-<p class="question">canMatch — feature-flag guard and auth guard; difference from canActivate</p>
-<p class="question">Navigation extras: state, info, replaceUrl, skipLocationChange, browserUrl</p>
-<p class="question">RedirectCommand — redirecting with state from a guard</p>
-<p class="question">Router configuration: paramsInheritanceStrategy, onSameUrlNavigation, urlUpdateStrategy</p>
-<p class="question">withInMemoryScrolling and scroll position restoration</p>
-<p class="question">Custom preloading strategy — data-driven preloading with route data</p>
-<p class="question">Router events — NavigationStart/End/Cancel/Error, RouteConfigLoadStart/End</p>
-<p class="question">Building a navigation-aware loading indicator using router events</p>
-<p class="question">RouterOutlet lifecycle: (activate) and (deactivate) events</p>
-<p class="question">ROUTER_OUTLET_DATA — passing reactive signal data from parent outlet to child component</p>
-<p class="question">UrlMatcher — matching routes by numeric ID or slug</p>
-<p class="question">Signals integration — isActive signal, withViewTransitions</p>
-<p class="question">withNavigationErrorHandler — redirecting to a 404 page on resolver errors</p>
-<p class="question">Named outlets — how they work and why to avoid them</p>
+  <title>Learn Angular Routing</title>
+  
+
+  <div class="container">
+    <header>
+      <h1>learn-routing works!</h1>
+      <p class="intro">This course covers the following topics:</p>
+    </header>
+
+    <!-- Question 1 -->
+    <article class="qa-card">
+      <h3 class="question">Router setup with provideRouter and feature functions</h3>
+      <div class="answer">
+        <p>Starting from Angular 15, Angular introduced the standalone API, where we can configure routing without using <code>AppRoutingModule</code>.</p>
+        <p>Instead of importing <code>RouterModule.forRoot()</code>, we use <code>provideRouter()</code> inside <code>app.config.ts</code> or during application bootstrap.</p>
+        <p><code>provideRouter()</code> accepts two things:</p>
+        <ul>
+          <li>Route definitions</li>
+          <li>Optional feature functions</li>
+        </ul>
+        <p>Feature functions allow us to enable router features like preloading, debugging, scrolling, hash-based navigation, and component input binding in a modular and tree-shakable way.</p>
+        <p>This approach reduces boilerplate, improves tree shaking, and aligns with Angular's standalone architecture. Angular introduced <code>provideRouter()</code> as part of its standalone architecture. It removes the dependency on NgModule, reduces boilerplate, improves tree shaking through feature functions, and offers a more modular way to configure routing. <code>RouterModule.forRoot()</code> is still supported for applications that continue to use NgModules.</p>
+        
+        <p>Feature functions enable optional router capabilities:</p>
+        <ul>
+          <li><code>withPreloading()</code>: Used to preload lazy-loaded modules after the initial application load.</li>
+          <li><code>withDebugTracing()</code>: Prints all router events.</li>
+          <li><code>withComponentInputBinding()</code>: Automatically binds route parameters to component inputs.</li>
+          <li><code>withInMemoryScrolling()</code>: Restores scroll position.</li>
+          <li><code>withHashLocation()</code>: Useful when the server cannot support HTML5 push-state routing.</li>
+          <li><code>withNavigationErrorHandler()</code>: Lets you define a global handler for navigation errors.</li>
+        </ul>
+
+<pre><code>providers: [
+  provideRouter(
+      routes,
+      withDebugTracing(),
+      withPreloading(PreloadAllModules),
+      withComponentInputBinding(),
+      withInMemoryScrolling(&#123; 
+          scrollPositionRestoration: 'enabled'
+      &#125; )
+  )
+]</code></pre>
+      </div>
+    </article>
+
+    <!-- Question 2 -->
+    <article class="qa-card">
+      <h3 class="question">Functional redirects — redirectTo as a function receiving params and query params</h3>
+      <div class="answer">
+        <p>In Angular 17+, <code>redirectTo</code> can be a function instead of a static string. This function receives the current route information, including route parameters and query parameters, allowing dynamic redirects based on runtime conditions.</p>
+<pre><code>path: 'search',
+redirectTo: (&#123;  queryParams &#125; ) =&gt;
+  `/products?category=$&#123; queryParams['category']&#125; `</code></pre>
+      </div>
+    </article>
+
+    <!-- Question 3 -->
+    <article class="qa-card">
+      <h3 class="question">Lazy loading with loadComponent and loadChildren</h3>
+      <div class="answer">
+        <p>Lazy loading is a technique where Angular loads code only when it's needed, reducing the initial bundle size and improving application startup time.</p>
+        <p><code>loadComponent</code> is used to lazy load a standalone component.</p>
+        <p><code>loadChildren</code> is used to lazy load a feature module or a standalone route configuration.</p>
+
+<pre><code>&#123; 
+  path: 'profile',
+  loadComponent: () =&gt;
+    import('./profile/profile.component')
+      .then(m =&gt; m.ProfileComponent)
+&#125; 
+&#123; 
+  path: 'admin',
+  loadChildren: () =&gt;
+    import('./admin/admin.routes')
+      .then(m =&gt; m.ADMIN_ROUTES)
+&#125; 
+
+import &#123;  Routes &#125;  from '@angular/router';
+
+export const ADMIN_ROUTES: Routes = [
+  &#123; 
+    path: '',
+    loadComponent: () =&gt;
+      import('./admin.component').then(m =&gt; m.AdminComponent)
+  &#125; 
+];</code></pre>
+      </div>
+    </article>
+
+    <!-- Question 4 -->
+    <article class="qa-card">
+      <h3 class="question">Navigation with routerLink, routerLinkActive, and ariaCurrentWhenActive</h3>
+      <div class="answer">
+        <p>Angular provides the <code>routerLink</code> directive for client-side navigation without reloading the page. <code>routerLinkActive</code> adds CSS classes when a route is active, and <code>ariaCurrentWhenActive</code> improves accessibility by setting the <code>aria-current</code> attribute for screen readers.</p>
+<pre><code>&lt;a
+  routerLink="/home"
+  routerLinkActive="active"&gt;
+  Home
+&lt;/a&gt;</code></pre>
+      </div>
+    </article>
+
+    <!-- Question 5 -->
+    <article class="qa-card">
+      <h3 class="question">Route parameters and withComponentInputBinding — params, query params, and resolved data as component inputs</h3>
+      <div class="answer">
+        <p><code>withComponentInputBinding()</code> automatically binds route params, query params, and resolved data to a component's <code>@Input()</code> properties. This removes the need to inject <code>ActivatedRoute</code> and manually read values.</p>
+
+<pre><code>// Traditional approach:
+constructor(private route: ActivatedRoute) &#123; &#125; 
+
+ngOnInit() &#123; 
+  const id = this.route.snapshot.params['id'];
+&#125; </code></pre>
+
+<pre><code>// Route configuration:
+&#123; 
+  path: 'user/:id',
+  component: UserComponent
+&#125; </code></pre>
+
+<pre><code>// Component input binding:
+import &#123;  Input &#125;  from '@angular/core';
+
+export class UserComponent &#123; 
+  @Input() id!: string;
+&#125; </code></pre>
+      </div>
+    </article>
+
+    <!-- Question 6 -->
+    <article class="qa-card">
+      <h3 class="question">Resolvers — ResolveFn, skipping HTTP with navigation state</h3>
+      <div class="answer">
+        <p>A Resolver fetches data before a route is activated. Using <code>ResolveFn</code>, Angular waits for the data to load and then passes it to the component, preventing empty screens or loading spinners. If the data is already available, we can pass it using navigation state and skip the HTTP request.</p>
+
+<pre><code>import &#123;  ResolveFn &#125;  from '@angular/router';
+
+export const userResolver: ResolveFn&lt;User&gt; = (route) =&gt; &#123; 
+  return inject(UserService).getUser(route.params['id']);
+&#125; ;</code></pre>
+
+<pre><code>&#123; 
+  path: 'user/:id',
+  component: UserComponent,
+  resolve: &#123; 
+    user: userResolver
+  &#125; 
+&#125; </code></pre>
+
+        <p><strong>Skipping HTTP with Navigation State</strong></p>
+        <p>Suppose you're on the Users List page and already have the user object. Instead of calling the API again:</p>
+
+<pre><code>this.router.navigate(['/user', user.id], &#123; 
+  state: &#123;  user &#125; 
+&#125; );</code></pre>
+
+<pre><code>const user = history.state.user;</code></pre>
+
+        <p>Pass the data using <code>router.navigate(..., &#123;  state &#125; )</code> and read it from <code>history.state</code> in the target component.</p>
+        <p><code>ResolveFn</code> loads data before navigation, and navigation state can be used to pass existing data and avoid unnecessary HTTP requests.</p>
+      </div>
+    </article>
+
+    <!-- Question 7 -->
+    <article class="qa-card">
+      <h3 class="question">Child routes, nested outlets, and relativeTo navigation</h3>
+      <div class="answer">
+        <p>Child routes allow us to create nested URLs and layouts. They are rendered inside a nested <code>&lt;router-outlet&gt;</code>. <code>relativeTo</code> is used for relative navigation instead of navigating from the application's root.</p>
+
+<pre><code>const routes: Routes = [
+  &#123; 
+    path: 'dashboard',
+    component: DashboardComponent,
+    children: [
+      &#123;  path: 'profile', component: ProfileComponent &#125; ,
+      &#123;  path: 'settings', component: SettingsComponent &#125; 
+    ]
+  &#125; 
+];</code></pre>
+
+        <p>Without <code>relativeTo</code>:</p>
+<pre><code>this.router.navigate(['/dashboard/settings']);</code></pre>
+
+        <p>With <code>relativeTo</code>:</p>
+<pre><code>this.router.navigate(['settings'], &#123; 
+  relativeTo: this.route
+&#125; );</code></pre>
+
+        <p><strong>Why Use relativeTo?</strong></p>
+        <ul>
+          <li>Avoid hardcoded full paths.</li>
+          <li>Easier to maintain when route structures change.</li>
+          <li>Useful for navigation within child routes.</li>
+        </ul>
+      </div>
+    </article>
+
+    <!-- Question 8 -->
+    <article class="qa-card">
+      <h3 class="question">Route-scoped providers — services created and destroyed with a route subtree</h3>
+      <div class="answer">
+        <p>Route-scoped providers allow us to create services that are available only within a specific route and its child routes. The service instance is created when the route loads and destroyed when that route subtree is removed. This helps isolate state and avoid keeping unnecessary services alive globally.</p>
+
+<pre><code>&#123; 
+  path: 'admin',
+  component: AdminComponent,
+  providers: [
+    AdminService
+  ],
+  children: [
+    &#123; 
+      path: 'users',
+      component: UsersComponent
+    &#125; 
+  ]
+&#125; </code></pre>
+
+        <div class="qa-subgroup">
+          <p><strong>Q. Where can we define route-scoped providers?</strong></p>
+          <p>A: Inside the <code>providers</code> array of a route configuration.</p>
+        </div>
+
+        <div class="qa-subgroup">
+          <p><strong>Q. When is the service destroyed?</strong></p>
+          <p>A: When the route subtree that created it is destroyed.</p>
+        </div>
+
+        <div class="qa-subgroup">
+          <p><strong>Q. Why not always use <code>providedIn: 'root'</code>?</strong></p>
+          <p>A: Root services live for the entire application lifecycle and may share state unnecessarily.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- Question 9 -->
+    <article class="qa-card">
+      <h3 class="question">Query parameters and queryParamsHandling (preserve, merge)</h3>
+      <div class="answer">
+        <p>Query parameters are optional URL parameters used to pass additional information like filters, sorting, or pagination. Angular provides <code>queryParamsHandling</code> to control how existing query parameters behave during navigation. It supports <code>merge</code> to combine old and new parameters, and <code>preserve</code> to keep existing parameters unchanged.</p>
+
+<pre><code>/products?page=2&amp;category=mobile
+page = 2
+category = mobile</code></pre>
+
+<pre><code>&lt;a 
+  routerLink="/products"
+  [queryParams]="&#123; category:'mobile'&#125; "&gt;
+  Products
+&lt;/a&gt;</code></pre>
+
+<pre><code>this.router.navigate(['/products'], &#123; 
+  queryParams: &#123; 
+    category: 'mobile'
+  &#125; ,
+  queryParamsHandling: 'merge'
+&#125; );</code></pre>
+      </div>
+    </article>
+
+    <!-- Question 10 -->
+    <article class="qa-card">
+      <h3 class="question">canActivate — authentication guard with redirect to login and return URL</h3>
+      <div class="answer">
+        <p><code>canActivate</code> is a route guard that decides whether a user can access a route before navigation happens. A common use case is authentication. If the user is logged in, navigation continues. Otherwise, the user is redirected to the login page, and the original URL is stored as a return URL so the user can be redirected back after successful login.</p>
+
+<pre><code>export const authGuard: CanActivateFn = (route, state) =&gt; &#123; 
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  if (authService.isLoggedIn()) &#123; 
+    return true;
+  &#125; 
+
+  return router.createUrlTree(['/login'], &#123; 
+    queryParams: &#123; 
+      returnUrl: state.url
+    &#125; 
+  &#125; );
+&#125; ;</code></pre>
+
+        <p><strong>Route Configuration</strong></p>
+<pre><code>&#123; 
+  path: 'dashboard',
+  component: DashboardComponent,
+  canActivate: [authGuard]
+&#125; </code></pre>
+        <p><code>canActivate</code> protects routes by checking authentication before navigation; unauthenticated users are redirected to login with a <code>returnUrl</code> to continue their original navigation after login.</p>
+      </div>
+    </article>
+
+    <!-- Question 11 -->
+    <article class="qa-card">
+      <h3 class="question">canActivateChild — protecting an entire child route subtree</h3>
+      <div class="answer">
+        <p><code>canActivateChild</code> is a route guard used to protect all child routes of a parent route. Instead of adding <code>canActivate</code> to every child route individually, we apply <code>canActivateChild</code> on the parent route, and Angular checks the guard before activating any child route.</p>
+
+<pre><code>&#123; 
+  path: 'admin',
+  component: AdminComponent,
+  canActivateChild: [authGuard],
+  children: [
+    &#123; 
+      path: 'users',
+      component: UsersComponent
+    &#125; ,
+    &#123; 
+      path: 'settings',
+      component: SettingsComponent
+    &#125; 
+  ]
+&#125; </code></pre>
+
+        <div class="qa-subgroup">
+          <p><strong>Q. When should you use canActivateChild?</strong></p>
+          <p>A: When multiple child routes require the same authorization check.</p>
+        </div>
+
+        <div class="qa-subgroup">
+          <p><strong>Q. Does canActivateChild protect the parent route also?</strong></p>
+          <p>A: No. It only protects child route activation. Use <code>canActivate</code> for the parent route itself.</p>
+        </div>
+
+        <div class="revision-note">
+          canActivateChild protects an entire child route tree using a single guard instead of adding guards to every child route individually.
+        </div>
+      </div>
+    </article>
+
+    <!-- Question 12 -->
+    <article class="qa-card">
+      <h3 class="question">canDeactivate — unsaved-changes confirmation dialog; bypassing the guard with info</h3>
+      <div class="answer">
+        <p><em>Answer details pending in source content.</em></p>
+      </div>
+    </article>
+
+    <!-- Question 13 -->
+    <article class="qa-card">
+      <h3 class="question">canMatch — feature-flag guard and auth guard; difference from canActivate</h3>
+      <div class="answer">
+        <p><code>canMatch</code> is a route guard that decides whether Angular should match a route during route selection. If it returns false, Angular skips that route and tries another matching route. It is commonly used for feature flags and conditional lazy loading.</p>
+        <p><code>canActivate</code> runs after a route is matched and decides whether the user can enter that route.</p>
+
+<pre><code>export const routes: Routes = [
+  &#123; 
+    path: 'new-dashboard',
+    canMatch: [featureFlagGuard],
+    loadComponent: () =&gt;
+      import('./new-dashboard.component')
+        .then(m =&gt; m.NewDashboardComponent)
+  &#125; ,
+  &#123; 
+    path: 'new-dashboard',
+    component: OldDashboardComponent
+  &#125; 
+];</code></pre>
+
+<pre><code>export const featureFlagGuard: CanMatchFn = () =&gt; &#123; 
+  const featureService = inject(FeatureService);
+
+  return featureService.isNewDashboardEnabled();
+&#125; ;</code></pre>
+
+        <div class="qa-subgroup">
+          <p><strong>Q. Can canMatch replace canActivate?</strong></p>
+          <p>A: No. <code>canMatch</code> controls route selection, while <code>canActivate</code> controls access after matching.</p>
+        </div>
+
+        <div class="qa-subgroup">
+          <p><strong>Q. Why is canMatch better for lazy loading?</strong></p>
+          <p>A: Because if <code>canMatch</code> returns false, Angular does not load the lazy route bundle.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- Question 14 -->
+    <article class="qa-card">
+      <h3 class="question">Navigation extras: state, info, replaceUrl, skipLocationChange, browserUrl</h3>
+      <div class="answer">
+        <p>Navigation extras are additional options passed during Angular navigation using <code>router.navigate()</code> or <code>routerLink</code>. They control how navigation behaves, what data is passed, and how the browser URL/history is updated.</p>
+        
+        <p>Common extras are:</p>
+        <ul>
+          <li><strong>state</strong> &rarr; pass data to the next route</li>
+          <li><strong>info</strong> &rarr; attach temporary navigation information</li>
+          <li><strong>replaceUrl</strong> &rarr; replace current browser history entry</li>
+          <li><strong>skipLocationChange</strong> &rarr; navigate without changing browser URL</li>
+          <li><strong>browserUrl</strong> &rarr; show a different URL in the address bar</li>
+        </ul>
+
+        <p><strong>1. state — Pass Data During Navigation</strong></p>
+<pre><code>this.router.navigate(['/user', 101], &#123; 
+  state: &#123; 
+    userName: 'John'
+  &#125; 
+&#125; );
+
+// Read in target component:
+const data = history.state.userName;
+// Output: John</code></pre>
+        <p><em>Use Case:</em> Passing already loaded data and avoiding another API call.</p>
+
+        <p><strong>2. info — Temporary Navigation Information</strong></p>
+<pre><code>this.router.navigate(['/photo'], &#123; 
+  info: &#123; 
+    source: 'gallery'
+  &#125; 
+&#125; );</code></pre>
+        <p><strong>Difference:</strong></p>
+        <ul>
+          <li><code>state</code>: Stored in browser history; available after navigation; good for data passing.</li>
+          <li><code>info</code>: Not stored in browser history; available only during current navigation; good for navigation behavior (e.g., animation direction, navigation source tracking).</li>
+        </ul>
+
+        <p><strong>3. replaceUrl</strong></p>
+        <p>Normally: <code>Login &rarr; Dashboard</code> (Press Back &rarr; Login)</p>
+<pre><code>this.router.navigate(['/dashboard'], &#123; 
+  replaceUrl: true
+&#125; );</code></pre>
+        <p>History becomes Dashboard. Back button will not return to login. Common use case: After login redirection.</p>
+
+        <p><strong>4. skipLocationChange</strong></p>
+        <p>Navigation happens but browser URL does not change.</p>
+<pre><code>this.router.navigate(['/admin'], &#123; 
+  skipLocationChange: true
+&#125; );
+// Before: /app
+// After navigation: Browser URL shows /app, actual route is /admin</code></pre>
+        <p><em>Use Case:</em> Internal navigation, wizard steps, hidden routes.</p>
+
+        <p><strong>5. browserUrl</strong></p>
+        <p>Allows displaying a different URL in the browser address bar.</p>
+<pre><code>this.router.navigate(['/product/123'], &#123; 
+  browserUrl: '/iphone'
+&#125; );
+// Angular route: /product/123
+// Browser shows: /iphone</code></pre>
+        <p><em>Useful for:</em> SEO-friendly URLs, custom displayed URLs.</p>
+      </div>
+    </article>
+
+    <!-- Question 15 -->
+    <article class="qa-card">
+      <h3 class="question">RedirectCommand — redirecting with state from a guard</h3>
+      <div class="answer">
+        <p><code>RedirectCommand</code> is used inside Angular guards when we need to redirect the user and also pass navigation extras like state. Unlike returning a simple <code>UrlTree</code>, <code>RedirectCommand</code> allows us to attach additional navigation options during the redirect.</p>
+        
+        <p><strong>Why RedirectCommand?</strong></p>
+        <p>Before: <code>return router.createUrlTree(['/login']);</code> (Cannot pass navigation extras like state).</p>
+        <p>With <code>RedirectCommand</code>:</p>
+<pre><code>return new RedirectCommand(
+  router.parseUrl('/login'),
+  &#123; 
+    state: &#123; 
+      message: 'Please login first'
+    &#125; 
+  &#125; 
+);</code></pre>
+
+        <p><strong>Example: Auth Guard</strong></p>
+<pre><code>export const authGuard: CanActivateFn = () =&gt; &#123; 
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  if (auth.isLoggedIn()) &#123; 
+    return true;
+  &#125; 
+
+  return new RedirectCommand(
+    router.parseUrl('/login'),
+    &#123; 
+      state: &#123; 
+        returnUrl: '/dashboard'
+      &#125; 
+    &#125; 
+  );
+&#125; ;</code></pre>
+
+        <p><strong>Reading State in Login Component:</strong></p>
+<pre><code>const returnUrl = history.state.returnUrl;
+console.log(returnUrl); // Output: /dashboard
+
+// After login:
+this.router.navigateByUrl(returnUrl);</code></pre>
+      </div>
+    </article>
+
+    <!-- Question 16 -->
+    <article class="qa-card">
+      <h3 class="question">Router configuration: paramsInheritanceStrategy, onSameUrlNavigation, urlUpdateStrategy</h3>
+      <div class="answer">
+        <p>Angular Router provides configuration options to control how route parameters are inherited, how navigation to the same URL behaves, and when the browser URL is updated during navigation.</p>
+
+        <p><strong>1. paramsInheritanceStrategy</strong></p>
+        <p>Controls how child routes inherit parameters and data from parent routes.</p>
+        <p>Default: <code>paramsInheritanceStrategy: 'emptyOnly'</code> (Child gets parent params only when child route has no own component or parent is an empty-path route).</p>
+
+<pre><code>// Use always:
+provideRouter(routes, &#123; 
+  paramsInheritanceStrategy: 'always'
+&#125; )
+
+// Route Structure:
+&#123; 
+  path: 'user/:userId',
+  children: [
+    &#123; 
+      path: 'profile',
+      component: ProfileComponent
+    &#125; 
+  ]
+&#125; 
+
+// URL: /user/101/profile
+// Available in ProfileComponent with 'always':
+this.route.snapshot.params['userId'] // 101</code></pre>
+
+        <p><strong>2. onSameUrlNavigation</strong></p>
+        <p>Controls what happens when navigating to the same URL.</p>
+        <ul>
+          <li>Default: <code>'ignore'</code> &mdash; ignores repeated navigation to the active URL.</li>
+          <li>Reload: <code>'reload'</code> &mdash; re-triggers navigation lifecycle events.</li>
+        </ul>
+      </div>
+    </article>
+
+    <!-- Question 17 -->
+    <article class="qa-card">
+      <h3 class="question">withInMemoryScrolling and scroll position restoration</h3>
+      <div class="answer">
+        <p><code>withInMemoryScrolling()</code> is an Angular Router feature used to manage scroll behavior during navigation. It allows Angular to restore the previous scroll position when users navigate back and scroll to the top when opening a new route.</p>
+
+<pre><code>// Enable Scrolling:
+provideRouter(
+  routes,
+  withInMemoryScrolling(&#123; 
+    scrollPositionRestoration: 'enabled'
+  &#125; )
+)</code></pre>
+
+        <p><strong>scrollPositionRestoration Options:</strong></p>
+        <ol>
+          <li><code>disabled</code> (default): No automatic scroll handling.</li>
+          <li><code>enabled</code>: Restores previous position on back navigation.</li>
+          <li><code>top</code>: Every navigation starts from scroll position 0,0.</li>
+        </ol>
+
+        <p><strong>Anchor Scrolling:</strong></p>
+        <p>Used for URLs like <code>/documentation#installation</code>.</p>
+<pre><code>provideRouter(
+  routes,
+  withInMemoryScrolling(&#123; 
+    anchorScrolling: 'enabled'
+  &#125; )
+)</code></pre>
+
+        <div class="qa-subgroup">
+          <p><strong>Q. What does withInMemoryScrolling() do?</strong></p>
+          <p>A: It configures Angular Router scroll behavior, including restoring previous scroll positions and handling anchor links.</p>
+        </div>
+
+        <div class="qa-subgroup">
+          <p><strong>Q. Difference between enabled and top?</strong></p>
+          <p>A: <code>enabled</code> restores previous position (better for back navigation); <code>top</code> always scrolls to the top (better for normal page navigation).</p>
+        </div>
+
+        <div class="revision-note">
+          One-Line Revision: withInMemoryScrolling() manages router scroll behavior; scrollPositionRestoration: 'enabled' restores previous scroll positions during back navigation.
+        </div>
+      </div>
+    </article>
+
+    <!-- Question 18 -->
+    <article class="qa-card">
+      <h3 class="question">Custom preloading strategy — data-driven preloading with route data</h3>
+      <div class="answer">
+        <p>Angular's custom preloading strategy allows us to control which lazy-loaded routes should be preloaded. Instead of preloading all modules, we can use route data properties to decide dynamically which routes need background loading.</p>
+
+        <p><strong>1. Add Preload Flag in Route Data</strong></p>
+<pre><code>&#123; 
+  path: 'admin',
+  loadChildren: () =&gt;
+    import('./admin.routes')
+      .then(m =&gt; m.ADMIN_ROUTES),
+  data: &#123; 
+    preload: true
+  &#125; 
+&#125; </code></pre>
+
+        <p><strong>2. Create Custom Preloading Strategy</strong></p>
+<pre><code>import &#123;  Injectable &#125;  from '@angular/core';
+import &#123;  PreloadingStrategy, Route &#125;  from '@angular/router';
+import &#123;  Observable, of &#125;  from 'rxjs';
+
+@Injectable(&#123; 
+  providedIn: 'root'
+&#125; )
+export class CustomPreloadingStrategy 
+  implements PreloadingStrategy &#123; 
+
+  preload(
+    route: Route,
+    load: () =&gt; Observable&lt;any&gt;
+  ): Observable&lt;any&gt; &#123; 
+
+    if (route.data?.['preload']) &#123; 
+      return load();
+    &#125; 
+
+    return of(null);
+  &#125; 
+&#125; </code></pre>
+
+        <p><strong>3. Register Strategy</strong></p>
+<pre><code>provideRouter(
+  routes,
+  withPreloading(CustomPreloadingStrategy)
+)</code></pre>
+
+        <div class="qa-subgroup">
+          <p><strong>Q. Why create a custom preloading strategy?</strong></p>
+          <p>A: To have control over which lazy-loaded routes are preloaded instead of loading every lazy module.</p>
+        </div>
+
+        <div class="qa-subgroup">
+          <p><strong>Q. Where do we define the preload condition?</strong></p>
+          <p>A: Inside the route's <code>data</code> property (e.g., <code>data: &#123;  preload: true &#125; </code>).</p>
+        </div>
+
+        <div class="revision-note">
+          One-Line Revision: A custom preloading strategy uses route data flags to decide which lazy-loaded routes should be downloaded in the background.
+        </div>
+      </div>
+    </article>
+
+    <!-- Question 19 -->
+    <article class="qa-card">
+      <h3 class="question">Router events — NavigationStart/End/Cancel/Error, RouteConfigLoadStart/End</h3>
+      <div class="answer">
+        <p>Angular Router emits events during the navigation lifecycle. We can subscribe to these events to track navigation status, show loaders, debug routing issues, or monitor lazy-loaded route loading.</p>
+
+<pre><code>constructor(router: Router) &#123; 
+  router.events.subscribe(event =&gt; &#123; 
+    console.log(event);
+  &#125; );
+&#125; </code></pre>
+
+        <p><strong>Navigation Events:</strong></p>
+        <ul>
+          <li><code>NavigationStart</code>: Fires when navigation begins.</li>
+          <li><code>NavigationEnd</code>: Fires when navigation completes successfully.</li>
+          <li><code>NavigationCancel</code>: Fires when navigation is cancelled (e.g., guard returns false or redirects).</li>
+          <li><code>NavigationError</code>: Fires when navigation fails due to an error.</li>
+        </ul>
+
+        <p><strong>Lazy Loading Events:</strong></p>
+        <ul>
+          <li><code>RouteConfigLoadStart</code>: Fires when Angular starts downloading a lazy route bundle.</li>
+          <li><code>RouteConfigLoadEnd</code>: Fires when lazy route configuration finishes loading.</li>
+        </ul>
+
+<pre><code>// Practical Example: Global Loader
+router.events.subscribe(event =&gt; &#123; 
+  if (event instanceof NavigationStart) &#123; 
+    this.loading = true;
+  &#125; 
+
+  if (
+    event instanceof NavigationEnd ||
+    event instanceof NavigationCancel ||
+    event instanceof NavigationError
+  ) &#123; 
+    this.loading = false;
+  &#125; 
+&#125; );</code></pre>
+
+        <div class="qa-subgroup">
+          <p><strong>Q. Difference between NavigationCancel and NavigationError?</strong></p>
+          <p>A: <code>NavigationCancel</code> happens when navigation is intentionally stopped (guard/resolver issue); <code>NavigationError</code> happens when navigation fails due to a runtime error or loading failure.</p>
+        </div>
+
+        <div class="revision-note">
+          One-Line Revision: Router events provide visibility into the navigation lifecycle: NavigationStart/End track navigation, Cancel/Error handle failures, and RouteConfigLoadStart/End track lazy loading.
+        </div>
+      </div>
+    </article>
+
+    <!-- Question 20 -->
+    <article class="qa-card">
+      <h3 class="question">Building a navigation-aware loading indicator using router events</h3>
+      <div class="answer">
+        <p>A navigation loading indicator in Angular is built by listening to Router events. We show the loader when navigation starts and hide it when navigation completes, is cancelled, or fails.</p>
+
+<pre><code>@Injectable(&#123; 
+  providedIn: 'root'
+&#125; )
+export class LoadingService &#123; 
+  loading = signal(false);
+
+  show() &#123;  this.loading.set(true); &#125; 
+  hide() &#123;  this.loading.set(false); &#125; 
+&#125; 
+
+// Router Event Listener:
+constructor(router: Router, loadingService: LoadingService) &#123; 
+  router.events.subscribe(event =&gt; &#123; 
+    if (event instanceof NavigationStart || event instanceof RouteConfigLoadStart) &#123; 
+      loadingService.show();
+    &#125; 
+
+    if (
+      event instanceof NavigationEnd ||
+      event instanceof NavigationCancel ||
+      event instanceof NavigationError ||
+      event instanceof RouteConfigLoadEnd
+    ) &#123; 
+      loadingService.hide();
+    &#125; 
+  &#125; );
+&#125; </code></pre>
+
+        <div class="qa-subgroup">
+          <p><strong>Q. Why not show loader only on NavigationStart and hide on NavigationEnd?</strong></p>
+          <p>A: Because navigation can also fail or be cancelled. Handling <code>NavigationCancel</code> and <code>NavigationError</code> prevents the loader from getting stuck.</p>
+        </div>
+
+        <div class="revision-note">
+          One-Line Revision: A navigation-aware loader listens to router lifecycle events: show on NavigationStart/RouteConfigLoadStart and hide on NavigationEnd, NavigationCancel, NavigationError, or RouteConfigLoadEnd.
+        </div>
+      </div>
+    </article>
+
+    <!-- Question 21 -->
+    <article class="qa-card">
+      <h3 class="question">RouterOutlet lifecycle: (activate) and (deactivate) events</h3>
+      <div class="answer">
+        <p>RouterOutlet provides lifecycle events that notify when a routed component is created or removed. The <code>activate</code> event fires when Angular loads a component into the outlet, and <code>deactivate</code> fires when Angular removes that component during navigation.</p>
+
+<pre><code>// Usage in Component
+onActivate(component: any) &#123; 
+  console.log('Loaded:', component);
+&#125; 
+
+onDeactivate(component: any) &#123; 
+  console.log('Removed:', component);
+&#125; </code></pre>
+
+        <p><strong>Practical Use Cases:</strong></p>
+        <ul>
+          <li>Track Page Components for analytics.</li>
+          <li>Cleanup Logic upon leaving pages.</li>
+          <li>Dynamic Component Interaction (calling methods on activated instances).</li>
+        </ul>
+
+        <div class="qa-subgroup">
+          <p><strong>Q. When does activate run?</strong></p>
+          <p>A: When Angular creates and attaches the routed component to the outlet.</p>
+        </div>
+
+        <div class="qa-subgroup">
+          <p><strong>Q. When does deactivate run?</strong></p>
+          <p>A: When Angular destroys the current routed component because navigation moved away.</p>
+        </div>
+
+        <div class="revision-note">
+          One-Line Revision: RouterOutlet's activate event runs when a routed component is loaded, and deactivate runs when it is removed during navigation.
+        </div>
+      </div>
+    </article>
+
+    <!-- Question 22 -->
+    <article class="qa-card">
+      <h3 class="question">ROUTER_OUTLET_DATA — passing reactive signal data from parent outlet to child component</h3>
+      <div class="answer">
+        <p><code>ROUTER_OUTLET_DATA</code> allows a parent component to pass reactive data to a routed child component through <code>RouterOutlet</code>. The data is provided as a signal, so the child can react to changes without using services or inputs.</p>
+
+<pre><code>&lt;!-- Parent Template --&gt;
+&lt;router-outlet [routerOutletData]="userData"&gt;&lt;/router-outlet&gt;</code></pre>
+
+<pre><code>// Parent Component
+userData = signal(&#123;  role: 'admin', theme: 'dark' &#125; );
+
+// Child Component
+export class ChildComponent &#123; 
+  outletData = inject(ROUTER_OUTLET_DATA);
+&#125; </code></pre>
+
+        <div class="qa-subgroup">
+          <p><strong>Q. What type of data does ROUTER_OUTLET_DATA provide?</strong></p>
+          <p>A: It provides a reactive signal containing data passed from the parent RouterOutlet.</p>
+        </div>
+
+        <div class="revision-note">
+          One-Line Revision: ROUTER_OUTLET_DATA passes reactive signal data from a parent RouterOutlet to routed child components without requiring services or route parameters.
+        </div>
+      </div>
+    </article>
+
+    <!-- Question 23 -->
+    <article class="qa-card">
+      <h3 class="question">UrlMatcher — matching routes by numeric ID or slug</h3>
+      <div class="answer">
+        <p><code>UrlMatcher</code> allows custom route matching logic when Angular's default path matching is not enough. Instead of using a static path, we provide a function that decides whether a URL segment matches a route.</p>
+
+<pre><code>// Custom Matcher Example (Numeric ID Only)
+export const numericIdMatcher: UrlMatcher = (segments: UrlSegment[]) =&gt; &#123; 
+  if (segments.length === 1 &amp;&amp; /^\d+$/.test(segments[0].path)) &#123; 
+    return &#123;  consumed: segments &#125; ;
+  &#125; 
+  return null;
+&#125; ;
+
+// Route declaration
+&#123;  matcher: numericIdMatcher, component: UserComponent &#125; </code></pre>
+
+        <div class="qa-subgroup">
+          <p><strong>Q. What happens if UrlMatcher returns null?</strong></p>
+          <p>A: Angular considers the route not matched and checks other available routes.</p>
+        </div>
+
+        <div class="revision-note">
+          One-Line Revision: UrlMatcher provides custom route matching logic when standard Angular path matching cannot handle specific URL patterns like numeric IDs or slugs.
+        </div>
+      </div>
+    </article>
+
+    <!-- Question 24 -->
+    <article class="qa-card">
+      <h3 class="question">Signals integration — isActive signal, withViewTransitions</h3>
+      <div class="answer">
+        <p>Angular Router integrates with Signals to provide reactive routing state. <code>RouterLinkActive</code> exposes an <code>isActive</code> signal to track whether a route is currently active. <code>withViewTransitions()</code> integrates the browser View Transitions API to create smooth animations between route changes.</p>
+
+<pre><code>// 1. View Transitions Setup
+provideRouter(
+  routes,
+  withViewTransitions()
+)</code></pre>
+
+<pre><code>/* 2. Example CSS Animation */
+::view-transition-old(root) &#123;  animation: fade-out 200ms; &#125; 
+::view-transition-new(root) &#123;  animation: fade-in 200ms; &#125; </code></pre>
+
+        <div class="qa-subgroup">
+          <p><strong>Q. Does Angular create the animations itself?</strong></p>
+          <p>A: No. Angular integrates with the browser View Transitions API. Developers define the animation styles using CSS.</p>
+        </div>
+
+        <div class="revision-note">
+          One-Line Revision: isActive provides reactive active-route tracking through Signals, while withViewTransitions() enables smooth browser-based animations during navigation.
+        </div>
+      </div>
+    </article>
+
+    <!-- Question 25 -->
+    <article class="qa-card">
+      <h3 class="question">withNavigationErrorHandler — redirecting to a 404 page on resolver errors</h3>
+      <div class="answer">
+        <p><code>withNavigationErrorHandler()</code> provides a global way to handle navigation errors. If a resolver, lazy loading, or route activation throws an error, we can catch it centrally and redirect the user to an error page like 404 instead of handling errors in every route.</p>
+
+<pre><code>provideRouter(
+  routes,
+  withNavigationErrorHandler(() =&gt; &#123; 
+    const router = inject(Router);
+    return router.createUrlTree(['/404']);
+  &#125; )
+)</code></pre>
+
+        <div class="qa-subgroup">
+          <p><strong>Q. What errors can withNavigationErrorHandler handle?</strong></p>
+          <p>A: Navigation errors caused by resolvers, guards, lazy-loaded routes, or route activation failures.</p>
+        </div>
+
+        <div class="revision-note">
+          One-Line Revision: withNavigationErrorHandler() catches router navigation failures globally and can redirect users to fallback pages like 404 when resolvers or routes fail.
+        </div>
+      </div>
+    </article>
+
+    <!-- Question 26 -->
+    <article class="qa-card">
+      <h3 class="question">Named outlets — how they work and why to avoid them</h3>
+      <div class="answer">
+        <p>Named outlets allow multiple routed components to be displayed at the same time using multiple <code>&lt;router-outlet&gt;</code> instances with different names.</p>
+
+<pre><code>&lt;!-- Outlets --&gt;
+&lt;router-outlet&gt;&lt;/router-outlet&gt;
+&lt;router-outlet name="chat"&gt;&lt;/router-outlet&gt;
+
+// Navigation
+this.router.navigate([&#123;  outlets: &#123;  chat: ['chat'] &#125;  &#125; ]);
+// URL: /home(chat:chat)</code></pre>
+
+        <p><strong>Why Avoid Named Outlets?</strong></p>
+        <ul>
+          <li><strong>Complex URLs:</strong> E.g., <code>/products(chat:open;help:faq)</code>.</li>
+          <li><strong>Difficult Navigation:</strong> Complex navigation object structures required.</li>
+          <li><strong>State Management Complexity:</strong> Multiple active route trees are harder to coordinate.</li>
+        </ul>
+
+        <div class="qa-subgroup">
+          <p><strong>Q. Why are named outlets less common today?</strong></p>
+          <p>A: They add routing complexity, and many use cases can be handled more simply with component composition, dialogs, or signals.</p>
+        </div>
+
+        <div class="revision-note">
+          One-Line Revision: Named outlets allow multiple routed components simultaneously, but they should be used carefully because they make URLs and navigation logic more complex.
+        </div>
+      </div>
+    </article>
+
+  </div>
